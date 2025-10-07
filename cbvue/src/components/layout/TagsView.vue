@@ -87,6 +87,12 @@ const initAffixTags = () => {
   }
 }
 
+// 刷新页面
+const refreshPage = () => {
+  // 简单的页面刷新
+  window.location.reload()
+}
+
 // 添加已访问视图
 const addVisitedView = (view: RouteLocationNormalizedLoaded) => {
   // 如果已经存在，则不重复添加
@@ -142,14 +148,8 @@ const closeAllTags = (view: RouteLocationNormalizedLoaded) => {
 
 // 刷新选中的标签
 const refreshSelectedTag = (view: RouteLocationNormalizedLoaded) => {
-  // 这里可以实现页面刷新逻辑
-  // 一种简单的方式是先跳转到一个空白页，然后再跳回来
-  const { fullPath } = view
-  nextTick(() => {
-    router.replace({
-      path: '/redirect' + fullPath
-    })
-  })
+  // 简单的刷新当前页面
+  refreshPage()
 }
 
 // 跳转到最后一个标签

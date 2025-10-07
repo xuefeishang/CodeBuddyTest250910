@@ -17,35 +17,54 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { RouteLocationMatched } from 'vue-router'
 
+// 定义面包屑项的接口
+interface BreadcrumbItem {
+  path: string
+  redirect?: string | object
+  meta?: {
+    title?: string
+  }
+}
+
 const route = useRoute()
 const router = useRouter()
-const breadcrumbs = ref<RouteLocationMatched[]>([])
+const breadcrumbs = ref<BreadcrumbItem[]>([])
 
 // 获取面包屑数据
 const getBreadcrumb = () => {
   // 过滤掉没有meta.title的路由
-  let matched = route.matched.filter(item => item.meta && item.meta.title)
+  let matched: BreadcrumbItem[] = route.matched
+    .filter(item => item.meta && item.meta.title)
+    .map(item => ({
+      path: item.path,
+      redirect: item.redirect,
+      meta: item.meta
+    }))
   
   // 如果第一个不是首页，添加首页
   const first = matched[0]
   if (first && first.path !== '/') {
-    matched = [
-      {
-        path: '/',
-        redirect: '/',
-        meta: { title: '首页' }
-      } as RouteLocationMatched
-    ].concat(matched)
+    const homeItem: BreadcrumbItem = {
+      path: '/',
+      redirect: '/',
+      meta: { title: '首页' }
+    }
+    matched = [homeItem, ...matched]
   }
   
   breadcrumbs.value = matched
 }
 
 // 处理链接点击
-const handleLink = (item: RouteLocationMatched) => {
+const handleLink = (item: BreadcrumbItem) => {
   const { redirect, path } = item
   if (redirect) {
-    router.push(redirect.toString())
+    // 处理不同类型的redirect
+    if (typeof redirect === 'string') {
+      router.push(redirect)
+    } else {
+      router.push(redirect as any)
+    }
     return
   }
   router.push(path)

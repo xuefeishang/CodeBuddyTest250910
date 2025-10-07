@@ -216,7 +216,7 @@ const shortcutList = ref([
 ])
 
 // 获取优先级对应的标签类型
-const getPriorityType = (priority: string) => {
+const getPriorityType = (priority: string): 'primary' | 'success' | 'warning' | 'info' | 'danger' => {
   switch (priority) {
     case '高':
       return 'danger'
@@ -225,7 +225,7 @@ const getPriorityType = (priority: string) => {
     case '低':
       return 'info'
     default:
-      return ''
+      return 'info'
   }
 }
 

@@ -10,7 +10,7 @@ const systemRoutes: RouteRecordRaw[] = [
     meta: { title: '系统管理', icon: 'Setting' },
     children: [
       {
-        path: '/system/user',
+        path: 'user',
         name: 'UserManagement',
         component: () => import('@/views/system/user/Index.vue'),
         meta: { title: '用户管理', icon: 'User' }
@@ -44,6 +44,12 @@ const crmRoutes: RouteRecordRaw[] = [
         name: 'CustomerManagement',
         component: () => import('@/views/crm/customer/Index.vue'),
         meta: { title: '客户管理', icon: 'Notebook' }
+      },
+      {
+        path: 'supplier',
+        name: 'SupplierManagement',
+        component: () => import('@/views/crm/supplier/Index.vue'),
+        meta: { title: '供应商管理', icon: 'Shop' }
       },
       {
         path: 'opportunity',
@@ -94,25 +100,25 @@ const productionRoutes: RouteRecordRaw[] = [
     meta: { title: '生产管理', icon: 'Operation' },
     children: [
       {
-        path: '/production/mineral-processing',
+        path: 'mineral-processing',
         name: 'MineralProcessing',
         component: () => import('@/views/production/mineral-processing/Index.vue'),
         meta: { title: '选矿管理', icon: 'Finished' }
       },
       {
-        path: '/production/mining',
+        path: 'mining',
         name: 'Mining',
         component: () => import('@/views/production/mining/Index.vue'),
         meta: { title: '采矿管理', icon: 'SetUp' }
       },
       {
-        path: '/production/tailings',
+        path: 'tailings',
         name: 'Tailings',
         component: () => import('@/views/production/tailings/Index.vue'),
         meta: { title: '尾矿管理', icon: 'SetUp' }
       },
       {
-        path: '/production/quality-control',
+        path: 'quality-control',
         name: 'QualityControl',
         component: () => import('@/views/production/quality-control/Index.vue'),
         meta: { title: '质检管理', icon: 'SetUp' }
@@ -159,23 +165,28 @@ const baseRoutes: RouteRecordRaw[] = [
     name: 'Login',
     component: () => import('@/views/Login.vue'),
     meta: { title: '登录' }
-  },
+  }
+]
+
+// 404 错误路由 - 必须放在最后
+const notFoundRoutes: RouteRecordRaw[] = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/NotFound.vue'),
-    meta: { title: '404' }
+    meta: { title: '页面未找到' }
   }
 ]
 
-// 合并所有路由
+// 合并所有路由 - 注意：通配符路由必须放在最后
 const routes: RouteRecordRaw[] = [
   ...baseRoutes,
   ...systemRoutes,
   ...crmRoutes,
   ...projectRoutes,
   ...productionRoutes,
-  ...workflowRoutes
+  ...workflowRoutes,
+  ...notFoundRoutes  // 通配符路由放在最后，确保其他路由优先匹配
 ]
 
 const router = createRouter({

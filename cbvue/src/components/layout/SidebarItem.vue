@@ -1,17 +1,7 @@
 <template>
-  <div v-if="!item.hidden">
-    <!-- 没有子菜单的情况 -->
-    <template v-if="!hasChildren(item)">
-      <el-menu-item :index="resolvePath(item.path)" @click="handleLink(resolvePath(item.path))">
-        <el-icon v-if="item.meta && item.meta.icon">
-          <component :is="item.meta.icon" />
-        </el-icon>
-        <template #title>{{ item.meta?.title }}</template>
-      </el-menu-item>
-    </template>
-    
+  <div v-if="!(item as any).hidden && item.meta?.title">
     <!-- 有子菜单的情况 -->
-    <el-sub-menu v-else :index="resolvePath(item.path)">
+    <el-sub-menu v-if="hasChildren(item)" :index="item.path">
       <template #title>
         <el-icon v-if="item.meta && item.meta.icon">
           <component :is="item.meta.icon" />
@@ -21,49 +11,61 @@
       
       <!-- 递归渲染子菜单 -->
       <sidebar-item
-        v-for="child in item.children"
+        v-for="child in getChildren(item)"
         :key="child.path"
         :item="child"
-        :base-path="resolvePath(child.path)"
       />
     </el-sub-menu>
+    
+    <!-- 没有子菜单的情况 -->
+    <el-menu-item v-else :index="item.path" @click="handleLink(item.path)">
+      <el-icon v-if="item.meta && item.meta.icon">
+        <component :is="item.meta.icon" />
+      </el-icon>
+      <template #title>{{ item.meta?.title }}</template>
+    </el-menu-item>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import type { RouteRecordRaw } from 'vue-router'
-import path from 'path-browserify'
+
+// 定义菜单项类型
+interface MenuItem {
+  path: string
+  name?: string
+  meta?: {
+    title: string
+    icon: string
+  }
+  children?: MenuItem[]
+  hidden?: boolean
+}
 
 // 定义props
 const props = defineProps({
   item: {
-    type: Object as () => RouteRecordRaw,
+    type: Object as () => MenuItem,
     required: true
-  },
-  basePath: {
-    type: String,
-    default: ''
   }
 })
 
 const router = useRouter()
 
 // 判断是否有子菜单
-const hasChildren = (route: RouteRecordRaw) => {
+const hasChildren = (route: MenuItem) => {
   if (route.children) {
-    return route.children.filter(child => !child.hidden).length > 0
+    return route.children.filter(child => !child.hidden && child.meta?.title).length > 0
   }
   return false
 }
 
-// 解析路径
-const resolvePath = (routePath: string) => {
-  if (/^(https?:|mailto:|tel:)/.test(routePath)) {
-    return routePath
+// 获取子菜单项
+const getChildren = (route: MenuItem) => {
+  if (route.children) {
+    return route.children.filter(child => !child.hidden && child.meta?.title)
   }
-  return path.resolve(props.basePath, routePath)
+  return []
 }
 
 // 处理链接点击
