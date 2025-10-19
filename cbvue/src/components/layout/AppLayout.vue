@@ -12,8 +12,8 @@
         <div class="user-info">
           <el-dropdown @command="handleCommand">
             <div class="user-avatar">
-              <el-avatar :size="32" :src="userInfo.avatar">{{ userInfo.realName?.charAt(0) }}</el-avatar>
-              <span class="user-name">{{ userInfo.realName }}</span>
+              <el-avatar :size="32" :src="userInfo?.avatar || ''">{{ userInfo?.realName?.charAt(0) || 'U' }}</el-avatar>
+              <span class="user-name">{{ userInfo?.realName || '用户' }}</span>
               <el-icon><ArrowDown /></el-icon>
             </div>
             <template #dropdown>

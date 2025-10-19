@@ -32,7 +32,7 @@ spring:
 # JWT配置
 jwt:
   secret: hxjl-enterprise-system-secret-key-2024
-  expiration: 86400 # 24小时
+  expiration: 1800 # 30分钟
   header: Authorization
 
 # 日志配置

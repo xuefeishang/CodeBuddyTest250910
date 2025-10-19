@@ -258,8 +258,10 @@ const handleLogin = () => {
           localStorage.removeItem('rememberedUsername')
         }
         
-        // 跳转到首页
-        router.push('/')
+        // 等待token完全设置后再跳转到首页
+        setTimeout(() => {
+          router.push({ path: '/', replace: true })
+        }, 100)
       } catch (error) {
         console.error('登录失败:', error)
         ElMessage.error('登录失败，请检查用户名和密码')

@@ -165,6 +165,10 @@ const baseRoutes: RouteRecordRaw[] = [
     name: 'Login',
     component: () => import('@/views/Login.vue'),
     meta: { title: '登录' }
+  },
+  {
+    path: '/home',
+    redirect: '/'
   }
 ]
 
@@ -199,13 +203,23 @@ router.beforeEach((to, from, next) => {
   // 设置页面标题
   document.title = `${to.meta.title as string || '华夏建龙企业级应用'} - 华夏建龙企业级应用系统`
   
-  // 这里可以添加登录验证、权限验证等逻辑
-  // 例如：检查是否登录
+  // 检查是否登录
   const isAuthenticated = localStorage.getItem('token')
   
   if (to.name !== 'Login' && !isAuthenticated) {
     // 如果未登录且访问的不是登录页，则重定向到登录页
-    next({ name: 'Login' })
+    if (to.path !== '/login') {
+      next({ name: 'Login' })
+    } else {
+      next()
+    }
+  } else if (to.name === 'Login' && isAuthenticated) {
+    // 如果已登录但访问登录页，则重定向到首页
+    if (to.path !== '/') {
+      next({ path: '/' })
+    } else {
+      next()
+    }
   } else {
     next()
   }

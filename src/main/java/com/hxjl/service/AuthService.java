@@ -48,9 +48,15 @@ public class AuthService {
         userInfo.setId(user.getId());
         userInfo.setUsername(user.getUsername());
         userInfo.setRealName(user.getRealName());
-        userInfo.setAvatar(user.getAvatar());
+        userInfo.setAvatar(user.getAvatar() != null ? user.getAvatar() : "/images/default-avatar.png");
         userInfo.setEmail(user.getEmail());
         userInfo.setPhone(user.getPhone());
+        // 设置角色和权限信息
+        userInfo.setRoles(user.getRoles().stream().map(role -> role.getRoleName()).toList());
+        // 简化处理权限，使用角色名称作为权限标识
+        userInfo.setPermissions(user.getRoles().stream()
+            .map(role -> "ROLE_" + role.getRoleName().toUpperCase())
+            .toList());
         
         LoginResponse response = new LoginResponse();
         response.setToken(jwt);

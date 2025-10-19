@@ -12,7 +12,7 @@ userStore.getUserInfo()
 
 <template>
   <!-- 登录页不使用布局 -->
-  <RouterView v-if="$route.path === '/login'" />
+  <RouterView v-if="$route.name === 'Login'" />
   
   <!-- 其他页面使用布局 -->
   <AppLayout v-else>

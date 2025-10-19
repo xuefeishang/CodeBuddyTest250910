@@ -15,9 +15,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.lang.NonNull;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    
+    private static final List<String> PUBLIC_PATHS = Arrays.asList(
+        "/api/auth/",
+        "/api/health",
+        "/api/info", 
+        "/api/test/public",
+        "/api/api-docs/",
+        "/api/swagger-ui/"
+    );
     
     @Autowired
     private JwtUtil jwtUtil;
@@ -25,10 +36,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
     
+    private boolean isPublicPath(String requestURI) {
+        return PUBLIC_PATHS.stream().anyMatch(path -> requestURI.startsWith(path));
+    }
+    
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, 
                                   @NonNull HttpServletResponse response, 
                                   @NonNull FilterChain filterChain) throws ServletException, IOException {
+        
+        String requestURI = request.getRequestURI();
+        
+        // 跳过公开路径的JWT验证
+        if (isPublicPath(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         
         final String authHeader = request.getHeader("Authorization");
         String username = null;

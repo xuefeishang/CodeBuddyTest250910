@@ -373,9 +373,9 @@ const getSupplierTypeTagType = (type: string) => {
     material: 'success',
     equipment: 'warning',
     service: 'info',
-    other: 'default'
+    other: 'primary'
   }
-  return types[type] || 'default'
+  return types[type] || 'info'
 }
 
 const getSupplierTypeText = (type: string) => {

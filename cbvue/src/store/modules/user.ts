@@ -1,81 +1,74 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { authService, type LoginRequest, type UserInfo } from '@/services/auth'
 
 export const useUserStore = defineStore('user', () => {
   // 状态
   const token = ref(localStorage.getItem('token') || '')
-  const userInfo = ref({
+  const userInfo = ref<UserInfo>({
     id: '',
     username: '',
     realName: '',
     avatar: '',
+    email: '',
+    phone: '',
     roles: [] as string[],
     permissions: [] as string[]
   })
   const isLoggedIn = ref(!!token.value)
 
   // 动作
-  const login = (loginData: { username: string; password: string }) => {
-    // 这里应该是实际的API调用，现在我们模拟一个成功的登录
-    return new Promise<void>((resolve) => {
-      // 模拟API请求延迟
-      setTimeout(() => {
-        const mockToken = 'mock-token-' + Date.now()
-        token.value = mockToken
-        localStorage.setItem('token', mockToken)
-        
-        // 模拟用户信息
-        userInfo.value = {
-          id: '1',
-          username: loginData.username,
-          realName: '测试用户',
-          avatar: 'https://placeholder.pics/svg/100/DEDEDE/555555/Avatar',
-          roles: ['admin'],
-          permissions: ['system:user:list', 'system:user:create', 'system:user:edit', 'system:user:delete']
-        }
-        
-        isLoggedIn.value = true
-        resolve()
-      }, 1000)
-    })
-  }
+  const login = async (loginData: LoginRequest) => {
+    try {
+      const response = await authService.login(loginData)
+      token.value = response.token
+      localStorage.setItem('token', response.token)
+      userInfo.value = response.userInfo
+      isLoggedIn.value = true
+      
 
-  const logout = () => {
-    // 清除用户信息
-    token.value = ''
-    localStorage.removeItem('token')
-    userInfo.value = {
-      id: '',
-      username: '',
-      realName: '',
-      avatar: '',
-      roles: [],
-      permissions: []
+    } catch (error) {
+      console.error('登录失败:', error)
+      throw error
     }
-    isLoggedIn.value = false
   }
 
-  const getUserInfo = () => {
-    // 这里应该是实际的API调用，现在我们模拟获取用户信息
-    return new Promise<void>((resolve) => {
-      // 如果已经有token，模拟获取用户信息
-      if (token.value) {
-        setTimeout(() => {
-          userInfo.value = {
-            id: '1',
-            username: 'admin',
-            realName: '管理员',
-            avatar: 'https://placeholder.pics/svg/100/DEDEDE/555555/Avatar',
-            roles: ['admin'],
-            permissions: ['system:user:list', 'system:user:create', 'system:user:edit', 'system:user:delete']
-          }
-          isLoggedIn.value = true
-          resolve()
-        }, 500)
-      } else {
-        resolve()
+  const logout = async () => {
+    try {
+      await authService.logout()
+    } catch (error) {
+      console.error('登出失败:', error)
+    } finally {
+      // 清除用户信息
+      token.value = ''
+      localStorage.removeItem('token')
+      userInfo.value = {
+        id: '',
+        username: '',
+        realName: '',
+        avatar: '',
+        email: '',
+        phone: '',
+        roles: [],
+        permissions: []
       }
-    })
+      isLoggedIn.value = false
+    }
+  }
+
+  const getUserInfo = async () => {
+    if (token.value) {
+      try {
+        const response = await authService.getCurrentUser()
+        userInfo.value = response
+        isLoggedIn.value = true
+      } catch (error) {
+        console.error('获取用户信息失败:', error)
+        // 如果获取用户信息失败，清除token
+        logout()
+        throw error
+      }
+    }
   }
 
   // 检查是否有某个权限

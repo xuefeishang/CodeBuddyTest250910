@@ -29,4 +29,18 @@ export default defineConfig({
       ]
     }
   },
+  server: {
+    port: 5173,
+    host: true,
+    strictPort: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
+      }
+    }
+  },
+  // 确保base URL正确设置
+  base: '/'
 })

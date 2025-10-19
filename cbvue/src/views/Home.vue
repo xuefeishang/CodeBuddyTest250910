@@ -4,9 +4,9 @@
     <el-card class="welcome-card">
       <template #header>
         <div class="welcome-header">
-          <el-avatar :size="64" :src="userInfo.avatar" />
+          <el-avatar :size="64" :src="userInfo?.avatar" />
           <div class="welcome-info">
-            <h2>欢迎回来，{{ userInfo.realName }}</h2>
+            <h2>欢迎回来，{{ userInfo?.realName || '用户' }}</h2>
             <p>今天是 {{ currentDate }}，祝您工作愉快！</p>
           </div>
         </div>
